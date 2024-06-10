@@ -1,0 +1,65 @@
+#!/usr/bin/env ruby
+require "os"
+require "socket"
+
+class Bashrc
+  def initialize
+    @a = "┌"
+    @b = "┐"
+    @c = "└"
+    @d = "┘"
+    @e = "-"
+    @f = "|"
+  end
+  def ltext(length, text)
+    looptext = ""
+    while looptext.length < length
+      looptext += text
+    end
+    looptext[0, length]
+  end
+  def draw(title, left, color, tab)
+    bg_oranye = color ? "\e[48;5;208m" : ""
+    reset = "\e[0m"
+
+    if title.split("\\n").kind_of?(Array)
+      lebar = title.split("\\n").max_by { |elem| elem.length }.length + 10
+    else
+      lebar = title.length + 6
+    end
+    puts "#{tab ? '     ' : '' }┌" + "─" * (lebar) + "┐"
+    title.split("\\n").each do |line|
+      if !(line.empty?)
+        puts "#{tab ? '     ' : '' }|   #{bg_oranye}#{line}#{reset}#{left ? '   |' : ''}"
+      end
+    end
+    puts "#{tab ? '     ' : '' }\e[0m└" + "─" * (lebar) + "┘"
+  end
+end
+
+text = Bashrc.new
+indent=" " * 10
+
+title = "#{indent}Code-seven#{indent}"
+puts text.draw(title, false, true, false)
+
+mem=`free -h | grep Mem`.split
+ip_get = Socket.ip_address_list
+ip_list = ip_get.map do |item|
+  item.ip_address if item.ip?  
+end.compact
+content1=[
+  { key: "OS", value: RUBY_PLATFORM },
+  { key: "RAM", value: "#{mem[1]}/\e[31m#{mem[2]}\e[0m/\e[32m#{mem[3]}\e[0m" },
+  { key: "IP", value: ip_list.last(3).join(" | ") },
+  { key: "UPTIME", value: `uptime -p`.strip },
+  { key: "CPU_CORE", value: `nproc`.strip },
+  { key: "SHELL", value: `bash --version`.match(/GNU bash, version \d+\.
+\d+\.\d+\(\d+\)-release/) || 'unknown' }
+]
+hasil = ""
+content1.each do |item|
+  hasil += sprintf('%-10s: %s\n', item[:key], item[:value])
+end
+puts text.draw(hasil, false, false, false)
+length = hasil.split("\\n").max_by { |elem| elem.length }.length

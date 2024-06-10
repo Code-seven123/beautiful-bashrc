@@ -1,0 +1,18 @@
+#!/bin/bash
+
+
+if command -v ruby &> /dev/null
+then
+    echo "Ruby is installed."
+    ruby -v
+    echo "copy command"
+    cp ./info $PREFIX/bin
+    echo "succes"
+    echo "copy bashrc and bash_aliases"
+    cp ./.bashrc ~/
+    cp ./.bash_aliases ~/
+    source ~/.bashrc
+else
+    echo "Ruby is not installed."
+    exit 1  # Keluar dengan status kode 1
+fi
