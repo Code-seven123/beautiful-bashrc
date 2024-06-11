@@ -47,13 +47,14 @@ puts text.draw(title, false, true, false)
 mem=`free -h | grep Mem`.split
 ip_get = Socket.ip_address_list
 ip_list = ip_get.map do |item|
-  item.ip_address if item.ip?  
+  item.ip_address if item.ip?
 end.compact
+ip_list.push(`curl -s ipv4.icanhazip.com`.strip)
 content1=[
   { key: "OS", value: RUBY_PLATFORM },
   { key: "PROCESSOR", value: Sys::CPU.processors[0].to_h[:processor] || unknown },
   { key: "RAM", value: "#{mem[1]}/\e[31m#{mem[2]}\e[0m/\e[32m#{mem[3]}\e[0m" },
-  { key: "IP", value: ip_list.last(3).join(" | ") },
+  { key: "IPV4", value: `curl -s ipv4.icanhazip.com`.strip },
   { key: "UPTIME", value: `uptime -p`.strip },
   { key: "CPU_CORE", value: `nproc`.strip },
   { key: "SHELL", value: `bash --version`.match(/GNU bash, version \d+\.\d+\.\d+\(\d+\)-release/) || 'unknown' },
@@ -63,4 +64,3 @@ content1.each do |item|
   hasil += sprintf('%-10s: %s\n', item[:key], item[:value])
 end
 puts text.draw(hasil, false, false, false)
-length = hasil.split("\\n").max_by { |elem| elem.length }.length
