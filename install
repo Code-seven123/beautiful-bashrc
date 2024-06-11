@@ -11,6 +11,7 @@ then
     echo "copy bashrc and bash_aliases"
     cp ./.bashrc ~/
     cp ./.bash_aliases ~/
+    gem install sys-cpu
     source ~/.bashrc
 else
     echo "Ruby is not installed."
